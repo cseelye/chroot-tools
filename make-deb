@@ -1,0 +1,50 @@
+#!/bin/bash
+set -eEuo pipefail
+
+PACKAGE_NAME=${PACKAGE_NAME-chroot-tools}
+PACKAGE_VERSION=${PACKAGE_VERSION-$(cat .version)}
+PACKAGE_REVISION=${PACKAGE_REVISION-$(cat .revision)}
+
+if [[ -z ${PACKAGE_NAME} ]]; then
+    echo "Missing PACKAGE_NAME"
+    exit 1
+fi
+if [[ -z ${PACKAGE_VERSION} ]]; then
+    echo "Missing PACKAGE_VERSION"
+    exit 1
+fi
+if [[ -z ${PACKAGE_REVISION} ]]; then
+    echo "Missing PACKAGE_REVISION"
+    exit 1
+fi
+
+package_dir=${PACKAGE_NAME}_${PACKAGE_VERSION}-${PACKAGE_REVISION}
+
+function cleanup()
+{
+    if [[ -n ${package_dir-} ]]; then
+        rm -rf ${package_dir}
+    fi
+}
+trap cleanup SIGINT SIGTERM ERR EXIT
+
+# Build the control file for the package
+mkdir -p ${package_dir}/DEBIAN
+cat <<EOF > ${package_dir}/DEBIAN/control
+Package: ${PACKAGE_NAME}
+Version: ${PACKAGE_VERSION}
+Architecture: all
+Maintainer: Carl Seelye <cseelye@gmail.com>
+Homepage: https://github.com/cseelye/chroot-tools
+Depends: squashfs-tools, xorriso
+Section: misc
+Priority: optional
+Description: Shell functions for manipulating images, ISOs, chroots
+EOF
+
+# Build the filesystem structure that the package will deliver
+mkdir -p ${package_dir}/usr/local/lib
+cp -a chroot_tools.sh ${package_dir}/usr/local/lib/chroot_tools.sh
+
+# Build the package
+dpkg-deb --build --root-owner-group ${package_dir}
