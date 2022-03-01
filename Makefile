@@ -19,7 +19,7 @@ deb: container
         $(TTY) \
         --init \
         --volume $$(pwd):/work \
-        --work-dir /work \
+        --workdir /work \
         --name chroot-tools-build \
         deb-tools \
         ./make-deb
