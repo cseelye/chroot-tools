@@ -35,3 +35,28 @@ jobs:
         with:
           files: chroot-tools*.deb
           tag_name: v${{ env.PACKAGE_VERSION }}
+
+      - name: Checkout deb-repo
+        uses: actions/checkout@v2
+        with:
+          repository: cseelye/deb-repo
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Add deb to repo
+        run: |
+          cp chroot-tools*.deb deb-repo/ppa/
+          cd deb-repo
+          make
+          git config --local user.email "$GITHUB_EMAIL"
+          git config --local user.name "$GITHUB_USERNAME"
+          git add -A
+          git commit -m "Update chroot-tools package"
+        env:
+          GITHUB_USERNAME: cseelye
+          GITHUB_EMAIL: cseelye@gmail.com
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.REPO_TOKEN }}
+          directory: deb-repo
+          repository: cseelye/deb-repo
