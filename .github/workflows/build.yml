@@ -27,11 +27,11 @@ jobs:
             github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: "refs/tags/v$PACKAGE_VERSION",
+              ref: "refs/tags/v${{ env.PACKAGE_VERSION }}",
               sha: context.sha
             })
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
           files: chroot-tools*.deb
-          tag_name: v$PACKAGE_VERSION
+          tag_name: v${{ env.PACKAGE_VERSION }}
