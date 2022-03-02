@@ -17,18 +17,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Get release version
-        run: |
-          echo "PACKAGE_VERSION=$(cat .version)-$(cat .revision)" >> $GITHUB_ENV
+        run: echo "PACKAGE_VERSION=$(cat .version)-$(cat .revision)" >> $GITHUB_ENV
       - name: Check if tag exists
         id: tag_exists
-        uses: mukunku/tag-exists-action@v1.0.0
-        with:
-          tag: v${{ env.PACKAGE_VERSION }}
-      - run: echo ${{ steps.tag_exists.outputs.exists }}
+        run: git show-ref --tags --verify --quiet -- "refs/tags/v${{ env.PACKAGE_VERSION }}" && echo "::set-output name=exists::0" || echo "::set-output name=exists::1"
 
   build:
     needs: check_tag
-    if: needs.check_tag.outputs.tag_exists
+    if: needs.check_tag.outputs.tag_exists == 0
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
