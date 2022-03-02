@@ -37,6 +37,8 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/chroot-tools
           make deb
+          pwd
+          ls -l
       - name: Create tag
         uses: actions/github-script@v5
         with:
@@ -50,7 +52,8 @@ jobs:
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
-          files: $GITHUB_WORKSPACE/chroot-tools/chroot-tools*.deb
+          files: chroot-tools/chroot-tools*.deb
+          fail_on_unmatched_files: true
           tag_name: v${{ env.PACKAGE_VERSION }}
 
       - name: Checkout deb-repo
