@@ -21,6 +21,9 @@ jobs:
       - name: Check if tag exists
         id: tag_exists
         run: git show-ref --tags --verify --quiet -- "refs/tags/v${{ env.PACKAGE_VERSION }}" && echo "::set-output name=exists::1" || echo "::set-output name=exists::0"
+      - run: |
+          git show-ref --tags --verify -- "refs/tags/v${{ env.PACKAGE_VERSION }}"
+          echo "steps.tag_exists.outputs.exists = ${{ steps.tag_exists.outputs.exists }}"
 
   build:
     needs: check_tag
