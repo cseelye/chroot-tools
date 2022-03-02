@@ -18,7 +18,9 @@ jobs:
         with:
           path: chroot-tools
       - name: Build package
-        run: make deb
+        run: |
+          cd $GITHUB_WORKSPACE/chroot-tools
+          make deb
       - name: Get release version
         run: |
           echo "PACKAGE_VERSION=$(cat .version)-$(cat .revision)" >> $GITHUB_ENV
