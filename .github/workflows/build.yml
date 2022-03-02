@@ -10,20 +10,33 @@ on:
   workflow_dispatch:
 
 jobs:
-  # This workflow contains a single job called "build"
+  check_tag:
+    runs-on: ubuntu-latest
+    outputs:
+      tag_exists: ${{ steps.tag_exists.outputs.exists }}
+    steps:
+      - name: Check if tag exists
+        id: tag_exists
+        uses: mukunku/tag-exists-action@v1.0.0
+        with:
+          tag: v${{ env.PACKAGE_VERSION }}
+      - run: echo ${{ steps.tag_exists.outputs.exists }}
+
   build:
+    needs: check_tag
+    if: needs.check_tag.outputs.tag_exists
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
           path: chroot-tools
+      - name: Get release version
+        run: |
+          echo "PACKAGE_VERSION=$(cat .version)-$(cat .revision)" >> $GITHUB_ENV
       - name: Build package
         run: |
           cd $GITHUB_WORKSPACE/chroot-tools
           make deb
-      - name: Get release version
-        run: |
-          echo "PACKAGE_VERSION=$(cat .version)-$(cat .revision)" >> $GITHUB_ENV
       - name: Create tag
         uses: actions/github-script@v5
         with:
@@ -37,7 +50,7 @@ jobs:
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
-          files: chroot-tools*.deb
+          files: $GITHUB_WORKSPACE/chroot-tools/chroot-tools*.deb
           tag_name: v${{ env.PACKAGE_VERSION }}
 
       - name: Checkout deb-repo
