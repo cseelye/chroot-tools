@@ -35,7 +35,7 @@ jobs:
           path: chroot-tools
       - name: Get release version
         run: |
-          echo "PACKAGE_VERSION=$(cat $GITHUB_WORKSPACE/chroot-tools.version)-$(cat $GITHUB_WORKSPACE/chroot-tools.revision)" >> $GITHUB_ENV
+          echo "PACKAGE_VERSION=$(cat $GITHUB_WORKSPACE/chroot-tools/.version)-$(cat $GITHUB_WORKSPACE/chroot-tools/.revision)" >> $GITHUB_ENV
       - name: Build package
         run: |
           cd $GITHUB_WORKSPACE/chroot-tools
