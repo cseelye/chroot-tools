@@ -22,7 +22,7 @@ jobs:
         id: tag_exists
         run: git show-ref --tags --verify --quiet -- "refs/tags/v${{ env.PACKAGE_VERSION }}" && echo "::set-output name=exists::1" || echo "::set-output name=exists::0"
       - run: |
-          git show-ref --tags --verify -- "refs/tags/v${{ env.PACKAGE_VERSION }}"
+          git show-ref --tags --verify -- "refs/tags/v${{ env.PACKAGE_VERSION }}" || true
           echo "steps.tag_exists.outputs.exists = ${{ steps.tag_exists.outputs.exists }}"
 
   build:
