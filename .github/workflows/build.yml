@@ -20,7 +20,7 @@ jobs:
         run: echo "PACKAGE_VERSION=$(cat .version)-$(cat .revision)" >> $GITHUB_ENV
       - name: Check if tag exists
         id: tag_exists
-        run: git show-ref --tags --verify --quiet -- "refs/tags/v${{ env.PACKAGE_VERSION }}" && echo "::set-output name=exists::0" || echo "::set-output name=exists::1"
+        run: git show-ref --tags --verify --quiet -- "refs/tags/v${{ env.PACKAGE_VERSION }}" && echo "::set-output name=exists::1" || echo "::set-output name=exists::0"
 
   build:
     needs: check_tag
