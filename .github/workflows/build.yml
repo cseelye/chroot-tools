@@ -16,6 +16,8 @@ jobs:
       tag_exists: ${{ steps.tag_exists.outputs.exists }}
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Get release version
         run: echo "PACKAGE_VERSION=$(cat .version)-$(cat .revision)" >> $GITHUB_ENV
       - name: Check if tag exists
