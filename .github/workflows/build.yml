@@ -15,6 +15,10 @@ jobs:
     outputs:
       tag_exists: ${{ steps.tag_exists.outputs.exists }}
     steps:
+      - uses: actions/checkout@v2
+      - name: Get release version
+        run: |
+          echo "PACKAGE_VERSION=$(cat .version)-$(cat .revision)" >> $GITHUB_ENV
       - name: Check if tag exists
         id: tag_exists
         uses: mukunku/tag-exists-action@v1.0.0
@@ -32,7 +36,7 @@ jobs:
           path: chroot-tools
       - name: Get release version
         run: |
-          echo "PACKAGE_VERSION=$(cat .version)-$(cat .revision)" >> $GITHUB_ENV
+          echo "PACKAGE_VERSION=$(cat $GITHUB_WORKSPACE/chroot-tools.version)-$(cat $GITHUB_WORKSPACE/chroot-tools.revision)" >> $GITHUB_ENV
       - name: Build package
         run: |
           cd $GITHUB_WORKSPACE/chroot-tools
