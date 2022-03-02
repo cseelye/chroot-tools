@@ -33,17 +33,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          path: chroot-tools
       - name: Get release version
         run: |
-          echo "PACKAGE_VERSION=$(cat $GITHUB_WORKSPACE/chroot-tools/.version)-$(cat $GITHUB_WORKSPACE/chroot-tools/.revision)" >> $GITHUB_ENV
+          echo "PACKAGE_VERSION=$(cat .version)-$(cat .revision)" >> $GITHUB_ENV
       - name: Build package
-        run: |
-          cd $GITHUB_WORKSPACE/chroot-tools
-          make deb
-          pwd
-          ls -l
+        run: make deb
       - name: Create tag
         uses: actions/github-script@v5
         with:
@@ -57,32 +51,6 @@ jobs:
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
-          files: chroot-tools/chroot-tools*.deb
+          files: chroot-tools*.deb
           fail_on_unmatched_files: true
           tag_name: v${{ env.PACKAGE_VERSION }}
-
-      - name: Checkout deb-repo
-        uses: actions/checkout@v2
-        with:
-          repository: cseelye/deb-repo
-          path: deb-repo
-          persist-credentials: false
-          fetch-depth: 0
-      - name: Add deb to repo
-        run: |
-          cp $GITHUB_WORKSPACE/chroot-tools/chroot-tools*.deb $GITHUB_WORKSPACE/deb-repo/ppa/
-          cd $GITHUB_WORKSPACE/deb-repo
-          make
-          git config --local user.email "$GITHUB_EMAIL"
-          git config --local user.name "$GITHUB_USERNAME"
-          git add -A
-          git commit -m "Update chroot-tools package"
-        env:
-          GITHUB_USERNAME: cseelye
-          GITHUB_EMAIL: cseelye@gmail.com
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.REPO_TOKEN }}
-          directory: deb-repo
-          repository: cseelye/deb-repo
